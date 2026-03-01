@@ -1,0 +1,14 @@
+# Secrets
+.env
+
+# Chrome session (contains login cookies)
+naukri_chrome_session/
+*_chrome_session/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
