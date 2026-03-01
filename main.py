@@ -221,14 +221,22 @@ def attempt_login(driver: webdriver.Chrome, email: str, password: str) -> None:
     email_xpaths = [
         "//input[contains(@placeholder,'Email') or contains(@placeholder,'email')]",
         "//input[contains(@name,'email')]",
+        "//input[contains(@id,'email') or contains(@id,'Email')]",
+        "//input[contains(@type,'email')]",
+        "//input[contains(@autocomplete,'email') or contains(@autocomplete,'username')]",
+        "(//form//input[not(@type='password') and not(@type='hidden') and not(@type='submit')])[1]",
     ]
     password_xpaths = [
         "//input[@type='password']",
         "//input[contains(@name,'password')]",
+        "//input[contains(@id,'password') or contains(@id,'Password')]",
+        "//input[contains(@placeholder,'Password') or contains(@placeholder,'password')]",
     ]
     submit_xpaths = [
         "//button[@type='submit']",
-        "//button[contains(.,'Login') or contains(.,'Sign in')]",
+        "//button[contains(.,'Login') or contains(.,'Sign in') or contains(.,'Log in')]",
+        "//input[@type='submit']",
+        "(//form//button)[last()]",
     ]
 
     def find_first(xpaths, label):
@@ -242,12 +250,16 @@ def attempt_login(driver: webdriver.Chrome, email: str, password: str) -> None:
                 logger.debug("Not found (%s): %s", label, xp)
         return None
 
+    logger.info("Waiting for login form to render...")
+    time.sleep(3)
+
     logger.info("Locating form fields...")
     email_el  = find_first(email_xpaths,    "email")
     pwd_el    = find_first(password_xpaths, "password")
     submit_el = find_first(submit_xpaths,   "submit")
 
     if not email_el or not pwd_el or not submit_el:
+        logger.error("Page source snippet:\n%s", driver.page_source[:2000])
         raise RuntimeError(
             f"Login form fields not found — "
             f"email={'✓' if email_el else '✗'}  "
